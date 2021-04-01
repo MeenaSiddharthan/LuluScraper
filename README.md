@@ -1,4 +1,4 @@
-##**LuLuScraper**
+#**LuLuScraper**
 Hi fellow shopaholic. Are you tired of mindless browsing on WMTM only to end up with nothing?
 
 #*Here's the solution!*

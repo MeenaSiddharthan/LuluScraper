@@ -28,7 +28,7 @@ for x in range(20):
         f = requests.get(link,headers=headers).text
         hun=BeautifulSoup(f,'html.parser')
         try:
-            price=hun.find("span",{"class":"price-1SDQy price"}).text.replace("\xa0"," ")
+            price=hun.find("span",{"class":"price-1SDQy price"}).text.replace("\xa0"," ").replace("USD","")
         except:
             price=None
         try:
@@ -43,7 +43,9 @@ for x in range(20):
             name=hun.find("div",{"itemprop":"name"}).text.replace('\n',"")
         except:
             name=None
-        clothes={"name":name, "color":color, "size":size, "price":price}
+        sale = price[price.find('Sale Price ')+11:price.find('  Regular Price ')]
+        original = price[price.find('Regular Price ')+14:]
+        clothes={"name":name, "original price":original, "sale price":sale, "color":color, "size":size}
         data.append(clothes)
         df = pd.DataFrame(data)
         overall_df = overall_df.append(df)

@@ -16,7 +16,6 @@ for x in range(20):
     k = requests.get('https://shop.lululemon.com/c/sale/_/N-1z0xcuuZ8t6?page='+str(x)).text
     soup=BeautifulSoup(k,'html.parser')
     productlist = soup.find_all("div",{"class":"product-tile__details"})
-    print(productlist)
     #Getting links
     productlinks = []
     for product in productlist:
@@ -32,7 +31,7 @@ for x in range(20):
         except:
             price=None
         try:
-            color=hun.find_all("div",{"role":"radio"})
+            color=hun.find("div",{"class":"purchase-attributes__color-details"}).text
         except:
             color=None
         try:

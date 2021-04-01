@@ -1,4 +1,5 @@
-<p>Hi fellow shopaholic!</p>Are you tired of mindless browsing on WMTM only to end up with nothing?
+<p>Hi fellow shopaholic!</p>
+<p>Are you tired of mindless browsing on WMTM only to end up with nothing?</p>
 
 <p>*Here's the solution!*</p>
 A little python script that gets all product names, original vs sale prices, colors and sizes available from 

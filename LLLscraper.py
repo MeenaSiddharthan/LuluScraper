@@ -12,7 +12,7 @@ baseurl = "https://shop.lululemon.com"
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36'}
 
 overall_df = pd.DataFrame()
-for x in range(20):
+for x in range(2):
     k = requests.get('https://shop.lululemon.com/c/sale/_/N-1z0xcuuZ8t6?page='+str(x)).text
     soup=BeautifulSoup(k,'html.parser')
     productlist = soup.find_all("div",{"class":"product-tile__details"})
@@ -44,7 +44,7 @@ for x in range(20):
             name=None
         sale = price[price.find('Sale Price ')+11:price.find('  Regular Price ')]
         original = price[price.find('Regular Price ')+14:]
-        clothes={"name":name, "original price":original, "sale price":sale, "color":color, "size":size}
+        clothes={"name":name, "original price":original, "sale price":sale, "color":color, "size":size, "product link":link}
         data.append(clothes)
         df = pd.DataFrame(data)
         overall_df = overall_df.append(df)

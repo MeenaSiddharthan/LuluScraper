@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Mar 30 13:06:33 2021
-
-@author: m.siddharthan
+Referenced:
+1. Scraping tutorial: https://www.freecodecamp.org/news/scraping-ecommerce-website-with-python/
+2. Continous scrolling scraping: https://morioh.com/p/3d46c0077e45
+3. Getting labels for multiple options: https://stackoverflow.com/questions/63946115/extract-text-from-an-aria-label-selenium-webdriver-python
+Author: MeenaSiddharthan @ Github
 """
 #Packages to scrape
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 
 ##Packages to scrape infinite scrolling
 #import time
@@ -43,21 +49,22 @@ import pandas as pd
 #for product in productlist:
 #    link = product.find("a",{"class":"link lll-font-weight-medium"}).get('href')
 #    productlinks.append(baseurl+link)
-
+#Specify main website to scrape from
 baseurl = "https://shop.lululemon.com"
-headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36'}
 
 overall_df = pd.DataFrame()
+#Loop over range of pages to get all product links
 for x in range(20):
+    #Reading HTML
     k = requests.get('https://shop.lululemon.com/c/sale/_/N-1z0xcuuZ8t6?page='+str(x)).text
     soup=BeautifulSoup(k,'html.parser')
     productlist = soup.find_all("div",{"class":"product-tile__details"})
-    #Getting links
+    #Getting links for all products
     productlinks = []
     for product in productlist:
             link = product.find("a",{"class":"link lll-font-weight-medium"}).get('href')
             productlinks.append(baseurl+link)
-    #Getting product info
+    #Getting product info for each product
     data=[]
     for link in productlinks:
         f = requests.get(link,headers=headers).text
@@ -67,11 +74,12 @@ for x in range(20):
         except:
             price=None
         try:
-            color=hun.find("div",{"class":"purchase-attributes__color-details"}).text
+            #color=hun.find("div",{"class":"purchase-attributes__color-details"}).text
+            color = [my_elem.get_attribute("aria-label") for my_elem in WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "div.swiper-wrapper>div[aria-label]")))]
         except:
             color=None
         try:
-            size=hun.find("div",{"class":"swiper-wrapper"}).text.replace('\n',"")
+            size=hun.find_all("span",{"class":"sizeTile-3p7Pr"}).text
         except:
             size=None
         try:
@@ -84,7 +92,10 @@ for x in range(20):
         data.append(clothes)
         df = pd.DataFrame(data)
         overall_df = overall_df.append(df)
+
 overall_df = overall_df.drop_duplicates(['name'])
+
+#Saves product info as excel file in same directory
 overall_df.to_csv('LLL-WMTM-today.csv',index=False)
 
 #DC scraping

@@ -86,11 +86,30 @@ for x in range(2):
         overall_df = overall_df.append(df)
 overall_df = overall_df.drop_duplicates(['name'])
 overall_df.to_csv('LLL-WMTM-today.csv',index=False)
-#text = """ 
-#<div class="swiper-wrapper" style="transform: translate3d(0px, 0px, 0px);">
-#<div role="radio" tabindex="-1" aria-checked="false" aria-label="Violet Verbena" class="swiper-slide swatch available swiper-slide-next" style="margin-right: 12px;">
-#<div role="radio" tabindex="-1" aria-checked="false" aria-label="Black" class="swiper-slide swatch available swiper-slide-next" style="margin-right: 12px;">
-#<div role="radio" tabindex="-1" aria-checked="false" aria-label="Coral" class="swiper-slide swatch available swiper-slide-next" style="margin-right: 12px;">
-#</div>"""
-#text1=BeautifulSoup(text,'html.parser')
-#text1.find_all(lambda tag: tag.name == 'div' and tag.get('role') == ['product'])
+
+#DC scraping
+# Import packages
+import requests
+from bs4 import BeautifulSoup
+
+# Specify url
+url = 'https://www.python.org/~guido/'
+
+# Package the request, send the request and catch the response: r
+r = requests.get(url)
+
+# Extracts the response as html: html_doc
+html_doc = r.text
+
+# create a BeautifulSoup object from the HTML: soup
+soup = BeautifulSoup(html_doc)
+
+# Print the title of Guido's webpage
+print(soup.title)
+
+# Find all 'a' tags (which define hyperlinks): a_tags
+a_tags = soup.find_all('a')
+
+# Print the URLs to the shell
+for link in a_tags:
+    print(link.get('href'))

@@ -8,4 +8,4 @@ A little abrapythondabra that compiles every product on WMTM, original vs sale p
 at present in a jiffy!
 All you have to do is install:
 <p> requests, pandas, BeautifulSoup and Selenium packages</p>
-<p> & run it on your preferred python IDE!</p>
+& run it on your preferred python IDE!

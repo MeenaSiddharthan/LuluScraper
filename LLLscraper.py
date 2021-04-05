@@ -48,7 +48,7 @@ baseurl = "https://shop.lululemon.com"
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36'}
 
 overall_df = pd.DataFrame()
-for x in range(2):
+for x in range(20):
     k = requests.get('https://shop.lululemon.com/c/sale/_/N-1z0xcuuZ8t6?page='+str(x)).text
     soup=BeautifulSoup(k,'html.parser')
     productlist = soup.find_all("div",{"class":"product-tile__details"})
@@ -93,8 +93,12 @@ import requests
 from bs4 import BeautifulSoup
 
 # Specify url
-url = 'https://www.python.org/~guido/'
-
+url = 'https://shop.lululemon.com/p/womens-leggings/Wunder-Train-HR-Tight-25-MD/_/prod9860128'
+r = requests.get(url).text
+soup = BeautifulSoup(r)
+color = soup.find_all('purchase-attributes__color-details')
+for i in color:
+    print()
 # Package the request, send the request and catch the response: r
 r = requests.get(url)
 

@@ -56,7 +56,7 @@ baseurl = "https://shop.lululemon.com"
 #driver = webdriver.Chrome()
 overall_df = pd.DataFrame()
 #Loop over range of pages to get all product links
-for x in range(20):
+for x in range(2):
     #Reading HTML
     #You can apply size filters on the actual website and paste below between (' to ?page=
     k = requests.get('https://shop.lululemon.com/c/sale/_/N-1z0xcuuZ8t6?page='+str(x)).text
@@ -82,25 +82,16 @@ for x in range(20):
         except:
             color=None
         try:
-            size=hun.find_all("span",{"class":"sizeTile-3p7Pr"})
-            lst = [str(i) for i in size]
-            size = []
-            for i in lst:
-                b=i[i.find('\'<span class="sizeTile-3p7Pr">')+30:i.find('</span>')]
-                if len(b) > 2:
-                    b=None
-                else:
-                    size.append(b)
-            size = ','.join(size)
+            category=hun.find("ul",{"class":"breadcrumbs-1Pb7p breadcrumbs"}).text.replace("Women's Clothes","")
         except:
-            size=None
+            category=None
         try:
             name=hun.find("div",{"itemprop":"name"}).text.replace('\n',"")
         except:
             name=None
         sale = price[price.find('Sale Price ')+11:price.find('  Regular Price ')]
         original = price[price.find('Regular Price ')+14:]
-        clothes={"name":name, "original price":original, "sale price":sale, "color":color, "sizes available":size, "product link":link}
+        clothes={"category":category, "name":name, "original price":original, "sale price":sale, "color":color, "product link":link}
         data.append(clothes)
         df = pd.DataFrame(data)
         overall_df = overall_df.append(df)

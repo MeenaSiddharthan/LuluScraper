@@ -5,15 +5,17 @@ Referenced:
 1. Scraping tutorial: https://www.freecodecamp.org/news/scraping-ecommerce-website-with-python/
 2. Continous scrolling scraping: https://morioh.com/p/3d46c0077e45
 3. Getting labels for multiple options: https://stackoverflow.com/questions/63946115/extract-text-from-an-aria-label-selenium-webdriver-python
+4. Working with bs4 element: https://stackoverflow.com/questions/20968562/how-to-convert-a-bs4-element-resultset-to-strings-python
 Author: MeenaSiddharthan @ Github
 """
 #Packages to scrape
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
+#from selenium import webdriver
+#from selenium.webdriver.support.ui import WebDriverWait
+#from selenium.webdriver.common.by import By
+#from selenium.webdriver.support import expected_conditions as EC
 
 ##Packages to scrape infinite scrolling
 #import time
@@ -39,7 +41,7 @@ from selenium.webdriver.support import expected_conditions as EC
 #    if (screen_height) * i > scroll_height:
 #        break 
 #
-###### Extract Reddit URLs #####
+###### Extract URLs #####
 #urls = []
 #baseurl = "https://shop.lululemon.com"
 #soup = BeautifulSoup(driver.page_source, "html.parser")
@@ -51,11 +53,12 @@ from selenium.webdriver.support import expected_conditions as EC
 #    productlinks.append(baseurl+link)
 #Specify main website to scrape from
 baseurl = "https://shop.lululemon.com"
-
+#driver = webdriver.Chrome()
 overall_df = pd.DataFrame()
 #Loop over range of pages to get all product links
 for x in range(20):
     #Reading HTML
+    #You can apply size filters on the actual website and paste below between (' to ?page=
     k = requests.get('https://shop.lululemon.com/c/sale/_/N-1z0xcuuZ8t6?page='+str(x)).text
     soup=BeautifulSoup(k,'html.parser')
     productlist = soup.find_all("div",{"class":"product-tile__details"})
@@ -67,19 +70,28 @@ for x in range(20):
     #Getting product info for each product
     data=[]
     for link in productlinks:
-        f = requests.get(link,headers=headers).text
+        f = requests.get(link).text
         hun=BeautifulSoup(f,'html.parser')
         try:
             price=hun.find("span",{"class":"price-1SDQy price"}).text.replace("\xa0"," ").replace("USD","")
         except:
             price=None
         try:
-            #color=hun.find("div",{"class":"purchase-attributes__color-details"}).text
-            color = [my_elem.get_attribute("aria-label") for my_elem in WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "div.swiper-wrapper>div[aria-label]")))]
+            color=hun.find("div",{"class":"purchase-attributes__color-details"}).text
+#            color = [my_elem.get_attribute("aria-label") for my_elem in WebDriverWait(driver, 20).until(EC.visibility_of_all_elements_located((By.CSS_SELECTOR, "div.swiper-wrapper>div[aria-label]")))]
         except:
             color=None
         try:
-            size=hun.find_all("span",{"class":"sizeTile-3p7Pr"}).text
+            size=hun.find_all("span",{"class":"sizeTile-3p7Pr"})
+            lst = [str(i) for i in size]
+            size = []
+            for i in lst:
+                b=i[i.find('\'<span class="sizeTile-3p7Pr">')+30:i.find('</span>')]
+                if len(b) > 2:
+                    b=None
+                else:
+                    size.append(b)
+            size = ','.join(size)
         except:
             size=None
         try:
@@ -88,7 +100,7 @@ for x in range(20):
             name=None
         sale = price[price.find('Sale Price ')+11:price.find('  Regular Price ')]
         original = price[price.find('Regular Price ')+14:]
-        clothes={"name":name, "original price":original, "sale price":sale, "color":color, "size":size, "product link":link}
+        clothes={"name":name, "original price":original, "sale price":sale, "color":color, "sizes available":size, "product link":link}
         data.append(clothes)
         df = pd.DataFrame(data)
         overall_df = overall_df.append(df)
@@ -98,33 +110,33 @@ overall_df = overall_df.drop_duplicates(['name'])
 #Saves product info as excel file in same directory
 overall_df.to_csv('LLL-WMTM-today.csv',index=False)
 
-#DC scraping
-# Import packages
-import requests
-from bs4 import BeautifulSoup
-
-# Specify url
-url = 'https://shop.lululemon.com/p/womens-leggings/Wunder-Train-HR-Tight-25-MD/_/prod9860128'
-r = requests.get(url).text
-soup = BeautifulSoup(r)
-color = soup.find_all('purchase-attributes__color-details')
-for i in color:
-    print()
-# Package the request, send the request and catch the response: r
-r = requests.get(url)
-
-# Extracts the response as html: html_doc
-html_doc = r.text
-
-# create a BeautifulSoup object from the HTML: soup
-soup = BeautifulSoup(html_doc)
-
-# Print the title of Guido's webpage
-print(soup.title)
-
-# Find all 'a' tags (which define hyperlinks): a_tags
-a_tags = soup.find_all('a')
-
-# Print the URLs to the shell
-for link in a_tags:
-    print(link.get('href'))
+##DC scraping
+## Import packages
+#import requests
+#from bs4 import BeautifulSoup
+#
+## Specify url
+#url = 'https://shop.lululemon.com/p/womens-leggings/Wunder-Train-HR-Tight-25-MD/_/prod9860128'
+#r = requests.get(url).text
+#soup = BeautifulSoup(r)
+#color = soup.find_all('purchase-attributes__color-details')
+#for i in color:
+#    print()
+## Package the request, send the request and catch the response: r
+#r = requests.get(url)
+#
+## Extracts the response as html: html_doc
+#html_doc = r.text
+#
+## create a BeautifulSoup object from the HTML: soup
+#soup = BeautifulSoup(html_doc)
+#
+## Print the title of Guido's webpage
+#print(soup.title)
+#
+## Find all 'a' tags (which define hyperlinks): a_tags
+#a_tags = soup.find_all('a')
+#
+## Print the URLs to the shell
+#for link in a_tags:
+#    print(link.get('href'))
